@@ -24,6 +24,47 @@ async def get_summary(text) -> str | None:
     except:
         return None
 
+async def fix_text(text) -> str | None:
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_fix', 
+                json={'text': text}, 
+                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+            ) as resp:
+                res = await resp.json()
+                return res['Responses'][0]['Response']
+    except:
+        return None
+
+
+async def improve_text(text) -> str | None:
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_improve', 
+                json={'text': text}, 
+                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+            ) as resp:
+                res = await resp.json()
+                return res['Responses'][0]['Response']
+    except:
+        return None
+
+
+async def short_text(text) -> str | None:
+    # try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_short', 
+                json={'text': text}, 
+                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+            ) as resp:
+                res = await resp.json()
+                return res['Responses'][0]['Response']
+    # except:
+    #     return None
+
 
 if __name__ == '__main__':
     async def main():

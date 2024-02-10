@@ -108,8 +108,11 @@ async def shorten_reply(msg: types.Message):
     text = get_text(msg_reply)
 
     if text is None: return
+
     
     
     result = await api_300.shorten_text(text)
+    
+    print(result)
     
     await msg.reply(result)
