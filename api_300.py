@@ -29,8 +29,12 @@ async def fix_text(text) -> str | None:
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_fix', 
-                json={'text': text}, 
-                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+                json={
+                    "TextSegments": [{"key": "text", "value": text}],
+                    "TemplaterOptions": {
+                        "Enabled": False
+                    }
+                }
             ) as resp:
                 res = await resp.json()
                 return res['Responses'][0]['Response']
@@ -42,9 +46,13 @@ async def improve_text(text) -> str | None:
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_improve', 
-                json={'text': text}, 
-                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_impr', 
+                json={
+                    "TextSegments": [{"key": "text", "value": text}],
+                    "TemplaterOptions": {
+                        "Enabled": False
+                    }
+                }
             ) as resp:
                 res = await resp.json()
                 return res['Responses'][0]['Response']
@@ -56,9 +64,13 @@ async def short_text(text) -> str | None:
     # try:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_short', 
-                json={'text': text}, 
-                headers={'Authorization': 'OAuth '+api_key, 'Content-Type': 'application/json'},
+                'http://gaw-gpu-browser.rtc.yandex.net/neuroedit/generative_shrt', 
+                json={
+                    "TextSegments": [{"key": "text", "value": text}],
+                    "TemplaterOptions": {
+                        "Enabled": False
+                    }
+                }
             ) as resp:
                 res = await resp.json()
                 return res['Responses'][0]['Response']
