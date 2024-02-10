@@ -13,6 +13,7 @@ import api_300
 
 def setup(dp: Dispatcher):
     dp.register_message_handler(bot_help, CommandHelp())
+    dp.register_message_handler(bot_help, CommandStart())
     dp.register_message_handler(summarize_reply, commands=['theses'])
     dp.register_message_handler(fix_reply, commands=['fix'])
     dp.register_message_handler(improve_reply, commands=['improve'])
@@ -21,6 +22,7 @@ def setup(dp: Dispatcher):
 
 async def bot_help(msg: types.Message):
     text = [
+        'Привет, я простой бот для обработки текста. Отправьте какой-нибудь текст, а затем отправьте команду-реплай.\n'
         'Список команд: ',
         '/fix - исправить ошибки в тексте',
         '/improve - улучшить текст',
