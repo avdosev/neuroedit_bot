@@ -22,6 +22,16 @@ def read_file(path):
     
     return None
 
+def write_file(path, info):
+    try:
+        with open(path, 'w') as f:
+            f.write(info)
+            f.flush()    
+    except:
+        logging.error('cant write file', path)
+    
+    return None
+
 
 def read_key(key):
     return read_file(f'sensitive_info/{key}')
