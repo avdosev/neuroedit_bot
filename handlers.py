@@ -6,12 +6,15 @@ from aiogram.utils.callback_data import CallbackData
 from helpers import *
 from aiogram.types import ParseMode
 from functools import reduce, partial
+import whisper_fast as whisper_voice
+from action_sender import ChatActionSender
 import asyncio
 import logging
 import re
 import html
 import api_300
 import uuid
+import io
 
 
 def setup(dp: Dispatcher):
@@ -21,6 +24,8 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(fix_reply, commands=['fix'])
     dp.register_message_handler(improve_reply, commands=['improve'])
     dp.register_message_handler(shorten_reply, commands=['shorten'])
+    dp.register_message_handler(
+        voice_listener, content_types=types.ContentTypes.VOICE)
     dp.register_message_handler(
         echo, content_types=types.ContentTypes.ANY)
     dp.register_callback_query_handler(echo_callback, cb.filter())
@@ -135,7 +140,7 @@ cb = CallbackData('echo',"text_id", "action")
 def get_inline_keyboard(text_id):
     # Creating a button
     buttons = [
-        InlineKeyboardButton(text="Выделить тезисы", callback_data=cb.new(text_id=text_id, action='theses')),
+        InlineKeyboardButton(text="Тезисы", callback_data=cb.new(text_id=text_id, action='theses')),
         InlineKeyboardButton(text="Улучшить", callback_data=cb.new(text_id=text_id, action='improve')),
         InlineKeyboardButton(text="Сократить", callback_data=cb.new(text_id=text_id, action='shorten')),
         InlineKeyboardButton(text="Исправить", callback_data=cb.new(text_id=text_id, action='fix')),
@@ -169,3 +174,19 @@ async def echo_callback(call: types.CallbackQuery, callback_data: dict):
         await call.message.reply(result, reply_markup=markup)
     finally:
         await call.answer()
+
+
+async def voice_listener(msg: types.Message):
+    logging.info(msg)
+    async with ChatActionSender.typing(bot=msg.bot, chat_id=msg.chat.id):
+        voice = io.BytesIO()
+        _ = await msg.voice.download(destination_file=voice, timeout=180)
+        text = await whisper_voice.transcribe(voice, f"voice:{msg.voice.file_id}")
+        text = re.sub(r"\[.*?\]", "", text)
+        
+        text_id = str(uuid.uuid1())
+    
+        write_file(f'data/{text_id}', text)
+        markup = get_inline_keyboard(text_id)
+
+        await msg.reply(text, reply_markup=markup)
